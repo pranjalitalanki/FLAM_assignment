@@ -78,3 +78,54 @@ for i in range(min(5, N)):
           f"vs pred(x={x_test[i]:.2f}, y={y_test[i]:.2f}) "
           f"[dx={x_diff:.2f}, dy={y_diff:.2f}]")
 
+def l1_loss(params, t, x_obs, y_obs):
+ 
+    theta, M, X = params
+    
+   
+    x_pred, y_pred = parametric_curve(t, theta, M, X)
+    
+   
+    x_errors = np.abs(x_obs - x_pred)
+    y_errors = np.abs(y_obs - y_pred)
+    
+    
+    total_loss = np.sum(x_errors) + np.sum(y_errors)
+    
+    return total_loss
+
+
+initial_params = [25.0, 0.0, 50.0]
+test_loss = l1_loss(initial_params, t, x_obs, y_obs)
+
+print(f"L1 loss with initial guess (θ=25°, M=0, X=50): {test_loss:.2f}")
+print(f"Average error per data point: {test_loss/(2*N):.4f} (x + y components)")
+
+
+print("\nTesting parameter sensitivity:")
+print("- Original loss:", test_loss)
+
+
+loss_theta_10 = l1_loss([10.0, 0.0, 50.0], t, x_obs, y_obs)
+loss_theta_40 = l1_loss([40.0, 0.0, 50.0], t, x_obs, y_obs)
+print(f"- θ=10° loss: {loss_theta_10:.2f} (change of {abs(loss_theta_10 - test_loss):.2f})")
+print(f"- θ=40° loss: {loss_theta_40:.2f} (change of {abs(loss_theta_40 - test_loss):.2f})")
+
+
+
+bounds = [
+    (0.1, 49.9),   
+    (-0.049, 0.049), 
+    (0.1, 99.9)   
+]
+
+
+initial_guess = [25.0, 0.0, 50.0] 
+
+print(f"Optimization bounds:")
+print(f"- θ (degrees): {bounds[0][0]:.1f} to {bounds[0][1]:.1f}")
+print(f"- M: {bounds[1][0]:.4f} to {bounds[1][1]:.4f}")
+print(f"- X: {bounds[2][0]:.1f} to {bounds[2][1]:.1f}")
+
+print(f"\nInitial parameter guess: θ={initial_guess[0]:.1f}°, M={initial_guess[1]:.4f}, X={initial_guess[2]:.1f}")
+print(f"Initial loss: {test_loss:.2f}")
