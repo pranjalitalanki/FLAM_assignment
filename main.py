@@ -1,6 +1,10 @@
 import numpy as np
 import pandas as pd
 
+import numpy as np
+import pandas as pd
+from scipy.optimize import minimize
+import matplotlib.pyplot as plt
 
 
 # Load the CSV 
@@ -129,3 +133,136 @@ print(f"- X: {bounds[2][0]:.1f} to {bounds[2][1]:.1f}")
 
 print(f"\nInitial parameter guess: θ={initial_guess[0]:.1f}°, M={initial_guess[1]:.4f}, X={initial_guess[2]:.1f}")
 print(f"Initial loss: {test_loss:.2f}")
+
+
+
+
+
+result = minimize(
+    l1_loss,                   
+    initial_guess,              
+    args=(t, x_obs, y_obs),     
+    bounds=bounds,              
+    method='L-BFGS-B',          
+    options={
+        'maxiter': 1000,        
+        'ftol': 1e-6            
+    }
+)
+
+
+theta_opt, M_opt, X_opt = result.x
+final_loss = result.fun
+
+print(f"Optimization {'successful!' if result.success else 'failed :('}")
+print(f"Message: {result.message}")
+print(f"\nOptimized Parameters:")
+print(f"  θ (theta) = {theta_opt:.3f}°")
+print(f"  M         = {M_opt:.6f}")
+print(f"  X         = {X_opt:.3f}")
+print(f"\nFinal L1 Loss: {final_loss:.2f}")
+print(f"Average error per point: {final_loss/(2*N):.4f}")
+
+
+x_fitted, y_fitted = parametric_curve(t, theta_opt, M_opt, X_opt)
+
+
+x_rmse = np.sqrt(np.mean((x_obs - x_fitted)**2))
+y_rmse = np.sqrt(np.mean((y_obs - y_fitted)**2))
+total_rmse = np.sqrt(x_rmse**2 + y_rmse**2)
+
+print(f"\n Quality Metrics:")
+print(f"  x RMSE: {x_rmse:.3f}")
+print(f"  y RMSE: {y_rmse:.3f}")
+print(f"  Combined RMSE: {total_rmse:.3f}")
+
+
+print("\n visualization...")
+
+plt.figure(figsize=(12, 8))
+
+plt.subplot(2, 2, 1)
+plt.scatter(x_obs, y_obs, s=10, alpha=0.6, color='blue', label='Observed Data (1501 points)')
+plt.plot(x_fitted, y_fitted, 'r-', linewidth=2, label=f'Fitted Curve\nθ={theta_opt:.1f}°, M={M_opt:.4f}, X={X_opt:.1f}')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Parametric Curve Fit in (x,y) Space')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+
+plt.subplot(2, 2, 2)
+plt.scatter(t, x_obs, s=10, alpha=0.6, color='blue', label='Observed x(t)')
+plt.plot(t, x_fitted, 'r-', linewidth=2, label='Fitted x(t)')
+plt.xlabel('t')
+plt.ylabel('x')
+plt.title('x-component Fit vs Time t')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+
+plt.subplot(2, 2, 3)
+plt.scatter(t, y_obs, s=10, alpha=0.6, color='blue', label='Observed y(t)')
+plt.plot(t, y_fitted, 'r-', linewidth=2, label='Fitted y(t)')
+plt.xlabel('t')
+plt.ylabel('y')
+plt.title('y-component Fit vs Time t')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+
+residuals_x = x_obs - x_fitted
+residuals_y = y_obs - y_fitted
+plt.subplot(2, 2, 4)
+plt.plot(t, residuals_x, 'b-', alpha=0.7, label='x residuals')
+plt.plot(t, residuals_y, 'r-', alpha=0.7, label='y residuals')
+plt.axhline(y=0, color='k', linestyle='--', alpha=0.5)
+plt.xlabel('t')
+plt.ylabel('Residuals (observed - fitted)')
+plt.title('Fit Residuals Over Time')
+plt.legend()
+plt.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.savefig('curve_fitting_results.png', dpi=300, bbox_inches='tight')
+plt.show()
+
+
+print("\nSaving results for assignment submission...")
+
+
+results = {
+    'theta_degrees': theta_opt,
+    'M': M_opt,
+    'X': X_opt,
+    'final_l1_loss': final_loss,
+    'x_rmse': x_rmse,
+    'y_rmse': y_rmse,
+    'total_rmse': total_rmse,
+    'success': result.success,
+    'iterations': result.nit if hasattr(result, 'nit') else 'unknown'
+}
+
+
+print("\n" + "="*60)
+print("=== FINAL PARAMETRIC EQUATIONS FOR SUBMISSION ===")
+print("\nCopy these equations for your LaTeX submission:")
+print(r"""
+x(t) = t \cos({theta_opt:.3f}^\circ) - e^{{{M_opt:.6f}|t|}} \sin(0.3t) \sin({theta_opt:.3f}^\circ) + {X_opt:.3f}
+
+y(t) = 42 + t \sin({theta_opt:.3f}^\circ) + e^{{{M_opt:.6f}|t|}} \sin(0.3t) \cos({theta_opt:.3f}^\circ)
+
+Where: θ = {theta_opt:.3f}°, M = {M_opt:.6f}, X = {X_opt:.3f}
+Final L1 Loss: {final_loss:.2f}
+""".format(**results, theta_opt=theta_opt, M_opt=M_opt, X_opt=X_opt, final_loss=final_loss))
+
+
+with open('final_results_fixed.txt', 'w', encoding='utf-8') as f:
+    f.write("Optimized Parameters:\n")
+    f.write(f"theta = {theta_opt:.6f} degrees\n")
+    f.write(f"M = {M_opt:.12f}\n")
+    f.write(f"X = {X_opt:.6f}\n")
+    f.write(f"Final L1 Loss = {final_loss:.6f}\n")
+    f.write("\nLaTeX Equations:\n")
+    f.write(f"x(t) = t * cos({theta_opt:.3f}°) - exp({M_opt:.6f} * |t|) * sin(0.3*t) * sin({theta_opt:.3f}°) + {X_opt:.3f}\n")
+    f.write(f"y(t) = 42 + t * sin({theta_opt:.3f}°) + exp({M_opt:.6f} * |t|) * sin(0.3*t) * cos({theta_opt:.3f}°)\n")

@@ -1,0 +1,9 @@
+Optimized Parameters:
+theta = 27.533999 degrees
+M = 0.018858142533
+X = 55.076006
+Final L1 Loss = 37807.747727
+
+LaTeX Equations:
+x(t) = t * cos(27.534°) - exp(0.018858 * |t|) * sin(0.3*t) * sin(27.534°) + 55.076
+y(t) = 42 + t * sin(27.534°) + exp(0.018858 * |t|) * sin(0.3*t) * cos(27.534°)
