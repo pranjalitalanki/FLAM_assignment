@@ -34,4 +34,4 @@ y_obs = data['y'].values
 for i in range(min(5, N)):
     print(f"t={t[i]:.2f}: x={x_obs[i]:.2f}, y={y_obs[i]:.2f}")
 
-
+print("\nData loading complete! Ready for curve implementation.")
