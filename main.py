@@ -244,9 +244,8 @@ results = {
 }
 
 
-print("\n" + "="*60)
-print("=== FINAL PARAMETRIC EQUATIONS FOR SUBMISSION ===")
-print("\nCopy these equations for your LaTeX submission:")
+
+
 print(r"""
 x(t) = t \cos({theta_opt:.3f}^\circ) - e^{{{M_opt:.6f}|t|}} \sin(0.3t) \sin({theta_opt:.3f}^\circ) + {X_opt:.3f}
 
