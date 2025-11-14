@@ -20,13 +20,13 @@ $$
 
 ## Assignment Submission String
 
-Copy this exact string for submission:
+
 
 `\left(t*\cos(27.534)-e^{0.018858\left|t\right|}\cdot\sin(0.3t)\sin(27.534)+55.076,42+ t*\sin(27.534)+e^{0.018858\left|t\right|}\cdot\sin(0.3t)\cos(27.534)\right)`
 
 ## Desmos Visualization
 
-Paste the submission string above into the Desmos calculator:  
+ 
 https://www.desmos.com/calculator/sfgpvxgg8a
 
 <img width="1913" height="851" alt="image" src="https://github.com/user-attachments/assets/8c3093cf-e97d-4a61-ad77-157aaea0ccc4" />
