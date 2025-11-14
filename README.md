@@ -27,7 +27,9 @@ Copy this exact string for submission:
 ## Desmos Visualization
 
 Paste the submission string above into the Desmos calculator:  
-https://www.desmos.com/calculator/rfj91yrxob
+https://www.desmos.com/calculator/sfgpvxgg8a
+
+<img width="1913" height="851" alt="image" src="https://github.com/user-attachments/assets/8c3093cf-e97d-4a61-ad77-157aaea0ccc4" />
 
 ## Implementation Overview
 
